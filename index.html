@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你的內耗等級是哪一種？</title>
+<style>
+  :root{
+    --bg:#EEF1EF;
+    --surface:#FFFFFF;
+    --ink:#212B36;
+    --ink-soft:#5A6670;
+    --green:#2F6F5E;
+    --green-deep:#24594B;
+    --amber:#D9A441;
+    --line:#DDE3DF;
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{font-size:16px;}
+  body{
+    font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:32px 20px 64px;}
+  .serif{font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px 28px;
+  }
+  @media (max-width:480px){.card{padding:26px 20px;}}
+
+  .eyebrow{
+    font-size:.78rem;letter-spacing:.28em;color:var(--green);
+    text-transform:uppercase;margin-bottom:14px;font-weight:600;
+  }
+  h1{font-size:1.9rem;line-height:1.35;font-weight:700;margin-bottom:18px;}
+  p{margin-bottom:14px;color:var(--ink);}
+  .soft{color:var(--ink-soft);font-size:.92rem;}
+
+  .btn{
+    display:inline-block;width:100%;
+    background:var(--green);color:#fff;border:none;cursor:pointer;
+    font-size:1.05rem;font-weight:600;font-family:inherit;
+    padding:15px 24px;border-radius:999px;
+    transition:background .18s ease,transform .12s ease;
+    text-align:center;
+  }
+  .btn:hover{background:var(--green-deep);}
+  .btn:active{transform:scale(.985);}
+  .btn:focus-visible{outline:3px solid var(--amber);outline-offset:3px;}
+
+  .progress-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:10px;
+  }
+  .progress-label{font-size:.85rem;color:var(--ink-soft);letter-spacing:.05em;}
+  .bar{height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin-bottom:28px;}
+  .bar-fill{height:100%;width:0;background:var(--green);border-radius:999px;transition:width .35s ease;}
+
+  .q-scene{
+    font-size:.85rem;color:var(--green);font-weight:600;
+    letter-spacing:.12em;margin-bottom:10px;
+  }
+  .q-text{font-size:1.22rem;font-weight:700;line-height:1.6;margin-bottom:24px;}
+  .opt{
+    display:flex;width:100%;text-align:left;cursor:pointer;
+    background:var(--bg);border:1.5px solid var(--line);
+    border-radius:12px;padding:14px 18px;margin-bottom:12px;
+    font-size:.98rem;font-family:inherit;color:var(--ink);line-height:1.65;
+    transition:border-color .15s ease,background .15s ease,transform .1s ease;
+  }
+  .opt-letter{flex:0 0 1.8em;font-weight:700;color:var(--green-deep);}
+  .opt-text{flex:1;}
+  .opt:hover{border-color:var(--green);background:#F5FAF8;}
+  .opt:active{transform:scale(.99);}
+  .opt:focus-visible{outline:3px solid var(--amber);outline-offset:2px;}
+
+  .type-tag{
+    display:inline-block;background:var(--green);color:#fff;
+    font-size:.88rem;font-weight:700;letter-spacing:.04em;
+    padding:7px 16px;border-radius:999px;margin-bottom:14px;
+  }
+  .type-name{font-size:1.55rem;font-weight:700;line-height:1.4;margin-bottom:12px;}
+  .level-value{
+    display:inline-block;
+    margin-left:.12em;
+    font-size:1.45em;
+    font-weight:900;
+    color:var(--green-deep);
+    line-height:1;
+    vertical-align:-.04em;
+  }
+  .pr-explain{
+    font-size:.9rem;color:var(--ink-soft);margin-top:-8px;margin-bottom:22px;
+  }
+  .result-message{
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    font-size:1rem;
+  }
+  .result-link{
+    display:block;
+    margin-top:18px;
+    color:var(--green-deep);
+    font-weight:600;
+    overflow-wrap:anywhere;
+  }
+  .result-separator{
+    border:0;
+    border-top:1px solid #D8DDDA;
+    margin:20px 0;
+  }
+  #r-course-title{font-weight:700;margin-bottom:12px;}
+  #r-course-detail{margin-bottom:0;}
+  .result-disclaimer{
+    margin-top:24px;padding-top:16px;border-top:1px dashed var(--line);
+    color:var(--ink-soft);font-size:.78rem;line-height:1.7;
+  }
+  .btn-ghost{
+    display:inline-block;width:100%;margin-top:28px;
+    background:var(--green);color:#fff;border:1.5px solid var(--green);
+    font-size:.98rem;font-weight:600;font-family:inherit;cursor:pointer;
+    padding:13px 24px;border-radius:999px;text-align:center;
+    text-decoration:none;
+    transition:background .15s ease;
+  }
+  .btn-ghost:hover{background:var(--green-deep);color:#fff;text-decoration:none;}
+  .btn-ghost:visited{color:#fff;text-decoration:none;}
+  .btn-ghost:focus-visible{outline:3px solid var(--amber);outline-offset:3px;color:#fff;text-decoration:none;}
+
+  .fade{animation:fadeUp .4s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="screen-intro" class="card fade">
+    <div class="eyebrow">內耗測驗</div>
+    <h1 class="serif">10 題快速測出<br>你的內耗等級！</h1>
+    <p>「內耗」是現代人最常見的困擾 。以下十個生活情境，請靠直覺選擇。完成後，你會看到自己目前的內耗等級。</p>
+    <button class="btn" type="button" onclick="startQuiz()">開始測驗</button>
+    <p class="soft" style="margin-top:14px;margin-bottom:0;">※ 測驗時間約 3 分鐘。結果僅供參考，非經標準化驗證的心理測驗、正式心理常模或醫療診斷。</p>
+  </section>
+
+  <section id="screen-quiz" class="card hidden">
+    <div class="progress-row">
+      <span class="progress-label" id="progress-label">第 1 題／共 10 題</span>
+    </div>
+    <div class="bar"><div class="bar-fill" id="bar-fill"></div></div>
+    <div id="q-container"></div>
+  </section>
+
+  <section id="screen-result" class="card hidden">
+    <div class="type-tag">測驗結果</div>
+    <div class="type-name serif" id="r-name"></div>
+    <p class="pr-explain" id="r-pr-explain"></p>
+    <div class="result-message">
+      <p id="r-message"></p>
+      <hr class="result-separator">
+      <p id="r-course-title"></p>
+      <p id="r-course-detail"></p>
+    </div>
+    <a id="r-cta" class="btn-ghost" href="https://reurl.cc/EYXAlR" target="_blank" rel="noopener noreferrer"></a>
+    <p class="result-disclaimer">※本測驗結果僅供參考，並非經標準化驗證的心理測驗、正式心理常模或醫療診斷。</p>
+  </section>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    scene:"場景一：會議室",
+    text:"會議上，老闆突然問「大家有什麼想法？」你其實有個點子。你的第一反應會是：",
+    opts:[
+      {label:"A", text:"太晚講的話，別人會把我的點子講走。管它好不好，趕快舉手就對了", score:0},
+      {label:"B", text:"心裡快速過一遍：這點子亮點是什麼、風險在哪，然後主動舉手發表", score:0},
+      {label:"C", text:"什麼想法？我剛剛恍神了，趕快問同事現在在討論什麼", score:1},
+      {label:"D", text:"想發言又擔心老闆不滿意、同事提出質疑，還是閉嘴好了", score:2}
+    ]
+  },
+  {
+    scene:"場景二：新的大專案",
+    text:"主管來問你：「有個大專案，你要不要接？」你會：",
+    opts:[
+      {label:"A", text:"看感覺。當下想接就接，不想就拒絕", score:0},
+      {label:"B", text:"理性盤點目前的工作負擔和需要的支援，盡快給答覆", score:0},
+      {label:"C", text:"一律先答應，但常常事後才發現自己事情已經做不完", score:1},
+      {label:"D", text:"好想試試看，但又很怕搞砸，遲遲做不了決定", score:2}
+    ]
+  },
+  {
+    scene:"場景三：已讀不回",
+    text:"晚上十點，你傳了訊息給朋友，一小時過去，已讀卻沒回。你會：",
+    opts:[
+      {label:"A", text:"根本沒發現對方已讀，傳完訊息就把手機丟旁邊了", score:0},
+      {label:"B", text:"注意到自己有點在意，但跟自己說「明天再問就好」，先睡吧", score:0},
+      {label:"C", text:"心想他大概在忙吧，邊追劇邊等", score:1},
+      {label:"D", text:"反覆點開聊天室，檢查自己是不是哪一句話說錯了", score:2}
+    ]
+  },
+  {
+    scene:"場景四：報告其實寫完了",
+    text:"一份報告其實已經完成，品質也不錯。寄出去之前，你會：",
+    opts:[
+      {label:"A", text:"不會怎樣，寫完當然就交出去", score:0},
+      {label:"B", text:"快速掃過重點段落，確認都沒問題就寄出", score:0},
+      {label:"C", text:"通常會突然想到：「慘了，死線是不是昨天啊？」", score:1},
+      {label:"D", text:"深怕出錯，死命檢查到最後一刻才按送出", score:2}
+    ]
+  },
+  {
+    scene:"場景五：睡前",
+    text:"夜深了，你躺上床，關了燈。你的大腦：",
+    opts:[
+      {label:"A", text:"三十秒內絕對斷電熟睡", score:0},
+      {label:"B", text:"偶爾會閃過一些念頭，但管他的，先睡再說", score:0},
+      {label:"C", text:"偶爾會閃過一些念頭，但會立刻化為幾個重點，明天起床後處理", score:1},
+      {label:"D", text:"不斷浮現各種讓人懊惱的往事，一回神剩沒多久就要起床了", score:2}
+    ]
+  },
+  {
+    scene:"場景六：聚會結束",
+    text:"朋友聚會散場，你走在回家的路上。你想的是：",
+    opts:[
+      {label:"A", text:"什麼都不會想，要想什麼？", score:0},
+      {label:"B", text:"通常會忘記聚會上發生什麼事，想不太起來", score:0},
+      {label:"C", text:"會想到聚會上的某些對話，但告訴自己過去就算了，不用太煩惱", score:1},
+      {label:"D", text:"「我那句話會不會很失禮？」、「應該換個說法的」一路煩惱到隔天", score:2}
+    ]
+  },
+  {
+    scene:"場景七：死線前一週",
+    text:"一件下週要交的任務，今天的你：",
+    opts:[
+      {label:"A", text:"有想法就做一點，沒想法就算了，反正時間到總是會有東西", score:0},
+      {label:"B", text:"知道自己愛拖延，今天立刻花 15 分鐘開工，開始做了，後續就會順", score:0},
+      {label:"C", text:"可能還沒想到，我通常都是前一、兩天才會想起來，然後倉促地做", score:1},
+      {label:"D", text:"已經為此焦慮好幾天，但什麼都還沒做，盡做跟任務無關的雜事", score:2}
+    ]
+  },
+  {
+    scene:"場景八：同事升遷了",
+    text:"跟你同期的同事升遷了。消息傳來的那一刻，你想的是：",
+    opts:[
+      {label:"A", text:"是喔。啊我們午餐吃什麼？", score:0},
+      {label:"B", text:"替他開心，也趁機想想自己接下來想往哪走、該補強什麼", score:0},
+      {label:"C", text:"心裡有點羨慕，但想想「每個人步調不一樣」，也就放下了", score:1},
+      {label:"D", text:"忍不住反覆比較「我到底哪裡不如他」，越想越覺得自己不夠好", score:2}
+    ]
+  },
+  {
+    scene:"場景九：難得的空閒",
+    text:"週末午後，手邊的事都告一段落，接下來幾個小時完全沒有安排。你會：",
+    opts:[
+      {label:"A", text:"太好了，直接躺平耍廢，一秒進入放空模式", score:0},
+      {label:"B", text:"想一下最近想做什麼，挑一件喜歡的事，好好享受這段時間", score:0},
+      {label:"C", text:"滑滑手機、開個影集，時間就這樣過去了，也沒特別在幹嘛", score:1},
+      {label:"D", text:"明明在休息，腦中卻一直冒出「是不是該做點正事」，越休息越焦慮", score:2}
+    ]
+  },
+  {
+    scene:"場景十：被指出問題",
+    text:"你交出去的東西，被主管當面點出一個錯誤。那一刻，你的反應是：",
+    opts:[
+      {label:"A", text:"喔，哪裡錯了？我改一下", score:0},
+      {label:"B", text:"先確認對方指的是哪個部分，把問題記下來，想好怎麼修正", score:0},
+      {label:"C", text:"表面說「好的我改」，但其實有點左耳進右耳出，回頭又忘了", score:1},
+      {label:"D", text:"瞬間覺得自己很爛，一整天反覆回想「他是不是覺得我很糟糕」", score:2}
+    ]
+  }
+];
+
+const RESULTS = {
+  low:{
+    level:"輕微",
+    message:"恭喜！你的內耗程度屬於【輕微】等級。這代表多數時候你不太會受內耗所苦，即便遇上難題，也可以有效幫自己梳理、快速振作。不過，有些人不內耗，可能是因為對周遭過度冷漠，如果你察覺你自己有這種狀況，建議增加對生活的關注，如多思考你喜不喜歡正在做的事、自己或旁人為何會有某些行為等。這麼一來，生活常常也會變得更豐富有趣喔！",
+    courseTitle:"大人學 2026 下半年最新線上課程【不內耗心理養成課】，現正預購優惠中！",
+    courseDetail:"",
+    cta:"點此搞懂內耗的來由與解法 >>"
+  },
+  medium:{
+    level:"中等",
+    message:"在所有受測者中，你的內耗程度屬於【中等】，有些煩惱也許一下就過，也有些煩惱會卡在心裡好久，卡著卡著，什麼正事都沒辦法專心做。這時候，你需要的不只是「別想那麼多」、「不要糾結」這類的開導（也許你早就知道沒有效）。你需要的是找到立即可用的內耗應對方式，排解已經存在的內耗，也降低將來再陷入內耗的機率。",
+    courseTitle:"大人學 2026 下半年最新線上課程【不內耗心理養成課】，現正預購優惠中！",
+    courseDetail:"課程中，你將學到心理師許庭韶「協助一萬位個案擺脫內耗」的有效方法。",
+    cta:"9 個對策學完就用 >>"
+  },
+  high:{
+    level:"強烈",
+    message:"在所有受測者中，你屬於最容易內耗的類型。想挑戰重要專案又怕自己做不到、別人比較晚回訊息你就擔心講錯話了、難得放假卻總覺得自己不該休息，這些很可能都是你的日常，對嗎？與其反覆花時間擺平內耗，更理想的方法或許是思考看看：有沒有什麼方法，能更早一步幫助你不陷入內耗？",
+    courseTitle:"大人學 2026 下半年最新線上課程【不內耗心理養成課】，現正預購優惠中！",
+    courseDetail:"課程中，你將學到心理師許庭韶「協助一萬位個案強韌心靈」的有效方法。",
+    cta:"立刻學習一生受用的心靈強韌法 >>"
+  }
+};
+
+// 依預估作答分布建立的總分與 PR 對照表。
+// 此對照僅供本趣味測驗使用，並非正式心理常模。
+// PR 結果顯示開關：改成 true 即可恢復結果頁的 PR 文字。
+const SHOW_PR_RESULT = false;
+
+const PR_BY_SCORE = [
+  1, 3, 5, 8, 11, 15,
+  22, 30, 40, 51, 63, 75,
+  80, 84, 88, 91, 94, 96, 98, 99, 100
+];
+
+let current = 0;
+let totalScore = 0;
+let acceptingAnswer = true;
+
+function show(id){
+  document.querySelectorAll("section").forEach(section=>section.classList.add("hidden"));
+  const element = document.getElementById(id);
+  element.classList.remove("hidden");
+  element.classList.remove("fade");
+  void element.offsetWidth;
+  element.classList.add("fade");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function startQuiz(){
+  current = 0;
+  totalScore = 0;
+  acceptingAnswer = true;
+  show("screen-quiz");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const question = QUESTIONS[current];
+  document.getElementById("progress-label").textContent =
+    "第 " + (current + 1) + " 題／共 " + QUESTIONS.length + " 題";
+  document.getElementById("bar-fill").style.width =
+    (current / QUESTIONS.length * 100) + "%";
+
+  const container = document.getElementById("q-container");
+  container.innerHTML = "";
+
+  const scene = document.createElement("div");
+  scene.className = "q-scene";
+  scene.textContent = question.scene;
+
+  const text = document.createElement("div");
+  text.className = "q-text";
+  text.textContent = question.text;
+
+  container.appendChild(scene);
+  container.appendChild(text);
+
+  // 每題隨機排列選項；選項文字與原始分數會一起移動。
+  const shuffledOptions = [...question.opts];
+  for(let i = shuffledOptions.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+  }
+
+  const displayLabels = ["A", "B", "C", "D"];
+  shuffledOptions.forEach((option, index)=>{
+    const button = document.createElement("button");
+    button.className = "opt";
+    button.type = "button";
+    button.innerHTML = '<span class="opt-letter">' + displayLabels[index] + '.</span><span class="opt-text"></span>';
+    button.querySelector(".opt-text").textContent = option.text;
+    button.addEventListener("click", ()=>answer(option.score));
+    container.appendChild(button);
+  });
+
+  acceptingAnswer = true;
+}
+
+function answer(score){
+  if(!acceptingAnswer) return;
+  acceptingAnswer = false;
+  totalScore += score;
+  current++;
+
+  if(current < QUESTIONS.length){
+    renderQuestion();
+  }else{
+    document.getElementById("bar-fill").style.width = "100%";
+    window.setTimeout(showResult, 250);
+  }
+}
+
+function showResult(){
+  let key;
+  if(totalScore <= 5){
+    key = "low";
+  }else if(totalScore <= 11){
+    key = "medium";
+  }else{
+    key = "high";
+  }
+
+  const result = RESULTS[key];
+  const pr = PR_BY_SCORE[totalScore];
+  document.getElementById("r-name").innerHTML = '內耗程度：<span class="level-value">' + result.level + '</span>';
+  const prExplain = document.getElementById("r-pr-explain");
+  prExplain.textContent =
+    "根據估算，你的內耗傾向約高於 " + pr + "% 的參與者";
+  prExplain.style.display = SHOW_PR_RESULT ? "" : "none";
+  document.getElementById("r-message").textContent = result.message;
+  document.getElementById("r-course-title").textContent = result.courseTitle;
+  const courseDetail = document.getElementById("r-course-detail");
+  courseDetail.textContent = result.courseDetail;
+  courseDetail.style.display = result.courseDetail ? "block" : "none";
+  document.getElementById("r-cta").textContent = result.cta;
+  show("screen-result");
+}
+
+function restart(){
+  document.getElementById("bar-fill").style.width = "0%";
+  show("screen-intro");
+}
+</script>
+</body>
+</html>
