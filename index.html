@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-91WQHWR9FD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-91WQHWR9FD');
+  gtag('event', 'quiz_view');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>你的內耗等級是哪一種？</title>
@@ -331,6 +340,7 @@ function startQuiz(){
   current = 0;
   totalScore = 0;
   acceptingAnswer = true;
+  gtag('event', 'quiz_start');
   show("screen-quiz");
   renderQuestion();
 }
@@ -403,6 +413,9 @@ function showResult(){
 
   const result = RESULTS[key];
   const pr = PR_BY_SCORE[totalScore];
+  gtag('event', 'quiz_complete', {
+    result_level: result.level
+  });
   document.getElementById("r-name").innerHTML = '內耗程度：<span class="level-value">' + result.level + '</span>';
   const prExplain = document.getElementById("r-pr-explain");
   prExplain.textContent =
@@ -416,6 +429,10 @@ function showResult(){
   document.getElementById("r-cta").textContent = result.cta;
   show("screen-result");
 }
+
+document.getElementById("r-cta").addEventListener("click", ()=>{
+  gtag('event', 'course_click');
+});
 
 function restart(){
   document.getElementById("bar-fill").style.width = "0%";
